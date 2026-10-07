@@ -1,1 +1,78 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V18 - Fix Loading</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src='//libtl.com/sdk.js' data-zone='11968926' data-sdk='show_11968926'></script>
+<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+<style>
+body{font-family:Arial;background:#f2f2f2;padding:10px;margin:0}
+.header{background:#111;color:white;padding:14px;border-radius:15px;text-align:center}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.product{background:white;border-radius:12px;padding:8px;text-align:center}
+.product img{width:100%;height:110px;object-fit:contain}
+.btn{padding:8px;border-radius:8px;color:white;font-weight:bold;font-size:11px;display:block;margin-top:5px;text-decoration:none}
+.amazon{background:#ff9900} .flipkart{background:#2874f0}
+#adOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.96);z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column;color:white;text-align:center}
+#timer{font-size:60px;color:#00ff88;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="header"><h3 style="margin:0">🛍️ Best Deals V18 - Fixed</h3><p id="info" style="font-size:11px;background:#00ff88;color:black;display:inline-block;padding:3px 10px;border-radius:20px">6 Products Ready</p></div>
+<div class="grid" id="grid">Loading products...</div>
+
+<div id="adOverlay">
+<h3>Ad chal raha hai...</h3>
+<div id="timer">15</div>
+<p style="font-size:12px;color:#aaa" id="adStatus">Adsgram + Monetag Ad</p>
+<p style="font-size:10px;color:#666;margin-top:20px">15 sec baad product khulega</p>
+</div>
+
+<script>
+const TAG="earningtadka8-21";
+const PRODUCTS=[
+{name:"T-Shirt Combo Pack 3",img:"https://m.media-amazon.com/images/I/71maWXZscfL._SX679_.jpg",kw:"men tshirt combo",store:"amazon"},
+{name:"Oversized T-Shirt",img:"https://m.media-amazon.com/images/I/61hLb3v2R5L._SY879_.jpg",kw:"oversized tshirt",store:"amazon"},
+{name:"Polo T-Shirt",img:"https://m.media-amazon.com/images/I/71U1T1o2yjL._SY879_.jpg",kw:"polo tshirt",store:"amazon"},
+{name:"Casual Shirt Men",img:"https://rukminim2.flixcart.com/image/832/832/xif0q/shirt/o/d/a/l-st2-vebnor-original-imah8pdnxdwzazgz.jpeg",kw:"men casual shirt",store:"flipkart"},
+{name:"Jeans Slim Fit",img:"https://rukminim2.flixcart.com/image/832/832/xif0q/jean/n/a/y/32-12213862-roadster-original-imah8f4yqzqz3g3a.jpeg",kw:"men jeans",store:"flipkart"},
+{name:"Running Shoes",img:"https://rukminim2.flixcart.com/image/832/832/xif0q/shoe/g/i/g/8-rng-854-grey-8-bruton-grey-original-imah8f4yqzqz3g3a.jpeg",kw:"running shoes",store:"flipkart"},
+];
+function render(){
+  let html="";
+  PRODUCTS.forEach(p=>{
+    let url = p.store==='amazon' ? `https://www.amazon.in/s?k=${encodeURIComponent(p.kw)}&tag=${TAG}` : `https://www.flipkart.com/search?q=${encodeURIComponent(p.kw)}`;
+    html+=`<div class="product"><img src="${p.img}" onerror="this.src='https://via.placeholder.com/150'"><p style="font-size:11px;height:28px;overflow:hidden">${p.name}</p><a class="btn ${p.store==='amazon'?'amazon':'flipkart'}" onclick="startAd('${url}')">View on ${p.store}</a></div>`;
+  });
+  document.getElementById('grid').innerHTML=html;
+  document.getElementById('info').innerText="V18 - 6 Products Loaded - "+new Date().toLocaleTimeString();
+}
+let pending=null, iv=null;
+function startAd(url){
+  pending=url;
+  document.getElementById('adOverlay').style.display='flex';
+  let t=15; document.getElementById('timer').innerText=t;
+  document.getElementById('adStatus').innerText="Ads loading...";
+  
+  // Ads call - fail bhi ho to bhi 15 sec ke baad khulega
+  try{ if(typeof show_11968926==='function'){ show_11968926(); } }catch(e){}
+  try{ const AdC=window.Adsgram.init({blockId:"int-52390"}); AdC.show().catch(()=>{}); }catch(e){}
+
+  iv=setInterval(()=>{
+    t--; document.getElementById('timer').innerText=t;
+    if(t<=0){
+      clearInterval(iv);
+      document.getElementById('adOverlay').style.display='none';
+      if(window.Telegram && Telegram.WebApp){ Telegram.WebApp.openLink(pending); }
+      else { window.open(pending,'_blank'); }
+    }
+  },1000);
+}
+render();
+</script>
+</body>
+</html> 
